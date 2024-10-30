@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'package:flutter/material.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:todo_app/screens/archived.dart';
 import 'package:todo_app/screens/done.dart';
 import 'package:todo_app/screens/task.dart';
@@ -25,6 +26,13 @@ class _HomePageState extends State<HomePage> {
     'done',
     'archived',
   ];
+  @override
+  void initState() {
+    // TODO: implement initState
+    createDataBase();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,6 +73,31 @@ class _HomePageState extends State<HomePage> {
         title: Text(titles[currentIndex]),
       ),
       body: screens[currentIndex],
+    );
+  }
+
+  void createDataBase() async {
+    var database = await openDatabase(
+      'todo.db',
+      version: 1,
+      onCreate: (database, version) {
+        database
+            .execute(
+                'CREATE TABLE tasks (id INTEGER PRIMARY KEY, title TEXT, data TEXT,time TEXT,status TEXT,)')
+            .then(
+          (value) {
+            print('table created');
+          },
+        ).catchError(
+          (onError) {
+            print('error is in the create table${onError.toString()}');
+          },
+        );
+        print('database created !!!!');
+      },
+      onOpen: (database) {
+        print('database open ');
+      },
     );
   }
 }
